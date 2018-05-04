@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "197706095253",
+    "firebase_url": "https://golden-nectar-171008.firebaseio.com",
+    "project_id": "golden-nectar-171008",
+    "storage_bucket": "golden-nectar-171008.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197706095253:android:1059217e636e4dfe",
+        "android_client_info": {
+          "package_name": "com.example.arife.geoquery_deneme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "197706095253-pk644f86b4m1hjsje3esdcngoq8nilg6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8mBdwTipFT3dPAQgFH8nZU716TS_UGy8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197706095253:android:d82d1745289e7574",
+        "android_client_info": {
+          "package_name": "com.example.arife.mobileprogrammingproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "197706095253-pk644f86b4m1hjsje3esdcngoq8nilg6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8mBdwTipFT3dPAQgFH8nZU716TS_UGy8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
