@@ -1,14 +1,16 @@
 package com.example.arife.mobileprogrammingproject;
 
-import android.content.Intent;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,13 +21,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
- * Created by Arife on 4.05.2018.
+ * Created by Arife on 5.05.2018.
  */
 
-public class SignInActivity extends AppCompatActivity {
+public class LogInActivity extends Fragment implements View.OnClickListener {
     private EditText mailText;
     private EditText passwordText;
-    private EditText passwordConfirmText;
+    private Button logInButton;
 
     private String userMail;
     private String userPassword;
@@ -35,57 +37,48 @@ public class SignInActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseReferance;
     private static String TAG ="Sign in activity";
 
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.signin_activity);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        //container değişecek attım şimdilik
+        View v = inflater.inflate(R.layout.login_activity,container,false);
 
-        mailText=findViewById(R.id.mail_editText);
-        passwordText = findViewById(R.id.password_editText);
-        passwordConfirmText = findViewById(R.id.confirm_password_editText);
-
+        mailText=v.findViewById(R.id.mail_editText);
+        passwordText = v.findViewById(R.id.password_editText);
+        logInButton = v.findViewById(R.id.login_button);
+        logInButton.setOnClickListener(this);
         //database kullancı bağlantısı
         mAuth = FirebaseAuth.getInstance();
+
+        return v;
     }
+
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
-    }
+    public void onClick(View view) {
+        if(view.getId() == R.id.login_button){
+            userMail = mailText.getText().toString();
+            userPassword = passwordText.getText().toString();
 
-
-    public void SignIn(View v){
-
-        userMail = mailText.getText().toString();
-        userPassword = passwordText.getText().toString();
-        userConfirmPassword = passwordConfirmText.getText().toString();
-
-        if(userPassword.equals(userConfirmPassword)){
-            mAuth.createUserWithEmailAndPassword(userMail, userPassword)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            mAuth.signInWithEmailAndPassword(userMail, userPassword)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Log.d(TAG, "createUserWithEmail:success");
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             } else {
-                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignInActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                //updateUI(null);
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                updateUI(null);
                             }
+
                         }
                     });
         }
-        else{
-            Toast.makeText(getApplicationContext(),"şifreler uyumlu değil",Toast.LENGTH_LONG).show();
-        }
     }
-
     private void updateUI(FirebaseUser user) {
         //burası ne yapacağına karar vereceğin yer
         if(user != null){
@@ -93,13 +86,12 @@ public class SignInActivity extends AppCompatActivity {
             User newUser = new User();
             newUser.setName(user.getDisplayName());
             newUser.setMail(user.getEmail());
-            newUser.setImage(user.getPhotoUrl().toString());
             newUser.setDailyCount(-1);
             mDatabaseReferance.child(user.getUid()).setValue(newUser);
 
-            Intent i = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(i);
-            finish();
+            //Intent i = new Intent(getActivity(),MainActivity.class);
+            //startActivity(i);
+            //finish();
         }
     }
 }

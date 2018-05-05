@@ -11,7 +11,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/mail_editText"/>
+        android:id="@+id/mailUp_editText"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/password_editText"/>
+        android:id="@+id/passwordUp_editText"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,6 +32,5 @@
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:id="@+id/signup_button"
-       android:text="Kayıt Ol"
-       android:onClick="SignIn"/>
+       android:text="Kayıt Ol" />
 </LinearLayout>
