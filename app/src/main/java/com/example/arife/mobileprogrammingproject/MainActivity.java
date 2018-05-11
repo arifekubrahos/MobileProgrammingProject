@@ -1,12 +1,11 @@
 package com.example.arife.mobileprogrammingproject;
 
-import android.support.v4.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     //remove eklenecek
@@ -20,16 +19,54 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void signUp(View v){
-        SignUpActivity signUpActivity = new SignUpActivity();
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment,signUpActivity);
-        fragmentTransaction.commit();
+        if(deleteLog()){
+            SignUpFragment signUpFragment = new SignUpFragment();
+            fragmentTransaction.add(R.id.fragment, signUpFragment, "signupfragment");
+            fragmentTransaction.commit();
+        }
+        else{
+            Toast.makeText(getApplicationContext(), "Beklenmeyen bir hata oluştu", Toast.LENGTH_LONG).show();
+        }
+
+    }
+    public boolean deleteLog(){
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        LogInFragment logInActivity = (LogInFragment) fragmentManager.findFragmentByTag("loginfragment");
+        if(logInActivity != null){
+            fragmentTransaction.remove(logInActivity);
+            fragmentTransaction.commit();
+            return true;
+        }
+        else if(fragmentTransaction.isEmpty()){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     public void logIn(View v){
-        LogInActivity logInActivity = new LogInActivity();
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment,logInActivity);
-        fragmentTransaction.commit();
-    }
+        if(deleteSign()){
+            LogInFragment logInActivity = new LogInFragment();
+            fragmentTransaction.add(R.id.fragment,logInActivity, "loginfragment");
+            fragmentTransaction.commit();
+        }
 
+    }
+    public boolean deleteSign(){
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        SignUpFragment signUpFragment = (SignUpFragment) fragmentManager.findFragmentByTag("signupfragment");
+        if(signUpFragment != null){
+            fragmentTransaction.remove(signUpFragment);
+            fragmentTransaction.commit();
+            return true;
+        }
+        else if(fragmentTransaction.isEmpty()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">MobileProgrammingProject</string>
+
+    <string name="categorie_names">kategori seçin</string>
+    <string name="child">gps</string>
+    <string-array name="categories">
+        <item>Ulaşım</item>
+        <item>Eğitim</item>
+        <item>Manevi</item>
+    </string-array>
+
+    <string name="button_inactive">#9E9E9E</string>
+    <string name="button_inactive_text">#FAFAFA</string>
 </resources>

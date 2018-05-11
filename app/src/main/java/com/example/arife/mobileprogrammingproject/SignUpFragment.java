@@ -1,6 +1,7 @@
 package com.example.arife.mobileprogrammingproject;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * Created by Arife on 4.05.2018.
  */
 
-public class SignUpActivity extends Fragment implements View.OnClickListener {
+public class SignUpFragment extends Fragment implements View.OnClickListener {
     private EditText mailText;
     private EditText passwordText;
     private EditText passwordConfirmText;
@@ -42,7 +43,7 @@ public class SignUpActivity extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         //container değişecek attım şimdilik
-        View v = inflater.inflate(R.layout.signup_activity,container,false);
+        View v = inflater.inflate(R.layout.signup_fragment,container,false);
 
         mailText=v.findViewById(R.id.mailUp_editText);
         passwordText = v.findViewById(R.id.passwordUp_editText);
@@ -66,8 +67,8 @@ public class SignUpActivity extends Fragment implements View.OnClickListener {
             newUser.setDailyCount(-1);
             mDatabaseReferance.child(user.getUid()).setValue(newUser);
 
-            //Intent i = new Intent(getActivity(),MainActivity.class);
-            //startActivity(i);
+            Intent i = new Intent(getActivity(),MainPageActivity.class);
+            startActivity(i);
             //finish();
         }
     }
