@@ -1,6 +1,7 @@
 package com.example.arife.mobileprogrammingproject;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -43,9 +44,9 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         //container değişecek attım şimdilik
         View v = inflater.inflate(R.layout.login_fragment,container,false);
 
-        mailText=v.findViewById(R.id.mail_editText);
-        passwordText = v.findViewById(R.id.password_editText);
-        logInButton = v.findViewById(R.id.login_button);
+        mailText=v.findViewById(R.id.input_email);
+        passwordText = v.findViewById(R.id.input_password);
+        logInButton = v.findViewById(R.id.btn_login);
         logInButton.setOnClickListener(this);
         //database kullancı bağlantısı
         mAuth = FirebaseAuth.getInstance();
@@ -56,9 +57,11 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.login_button){
-            userMail = mailText.getText().toString();
-            userPassword = passwordText.getText().toString();
+        if(view.getId() == R.id.btn_login && validate()){
+            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Giriş yapılıyor...");
+            progressDialog.show();
 
             mAuth.signInWithEmailAndPassword(userMail, userPassword)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -67,12 +70,24 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
+                                final FirebaseUser user = mAuth.getCurrentUser();
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                updateUI(user);
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                updateUI(null);
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                updateUI(null);
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
                             }
 
                         }
@@ -82,16 +97,33 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     private void updateUI(FirebaseUser user) {
         //burası ne yapacağına karar vereceğin yer
         if(user != null){
-            mDatabaseReferance = FirebaseDatabase.getInstance().getReference("Users");
-            User newUser = new User();
-            newUser.setName(user.getDisplayName());
-            newUser.setMail(user.getEmail());
-            newUser.setDailyCount(-1);
-            mDatabaseReferance.child(user.getUid()).setValue(newUser);
 
             Intent i = new Intent(getActivity(),MainPageActivity.class);
             startActivity(i);
             //finish();
         }
     }
+
+     public boolean validate(){
+         boolean valid = true;
+
+         userMail = mailText.getText().toString();
+         userPassword = passwordText.getText().toString();
+
+         if (userMail.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(userMail).matches()) {
+             mailText.setError("Geçerli bir mail adresi girin");
+             valid = false;
+         } else {
+             mailText.setError(null);
+         }
+
+         if (userPassword.isEmpty() || userPassword.length() < 4 || userPassword.length() > 10) {
+             passwordText.setError("Lütfen gçerli bir şifre girin");
+             valid = false;
+         } else {
+             passwordText.setError(null);
+         }
+
+         return valid;
+     }
 }

@@ -7,7 +7,6 @@ package com.example.arife.mobileprogrammingproject;
 public class User {
     private String name;
     private String mail;
-    private String image;
     private int dailyCount; //gönderi atma hakkı var mı?
 
     public User() {
@@ -28,11 +27,11 @@ public class User {
         return mail;
     }
 
-    public int getDailyCount() {
+    public int getHelpCount() {
         return dailyCount;
     }
 
-    public void setDailyCount(int dailyCount) {
+    public void setHelpCount(int dailyCount) {
         this.dailyCount = dailyCount;
     }
 }

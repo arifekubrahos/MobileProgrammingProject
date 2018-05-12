@@ -1,11 +1,13 @@
 package com.example.arife.mobileprogrammingproject;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 
 public class SignUpFragment extends Fragment implements View.OnClickListener {
+
+    private EditText nameText;
     private EditText mailText;
     private EditText passwordText;
     private EditText passwordConfirmText;
@@ -38,17 +42,18 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReferance;
     private static String TAG ="Sign in activity";
+    private String userName;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        //container değişecek attım şimdilik
         View v = inflater.inflate(R.layout.signup_fragment,container,false);
 
-        mailText=v.findViewById(R.id.mailUp_editText);
-        passwordText = v.findViewById(R.id.passwordUp_editText);
-        passwordConfirmText = v.findViewById(R.id.confirm_password_editText);
-        signUpButton = v.findViewById(R.id.signup_button);
+        nameText = v.findViewById(R.id.input_name);
+        mailText=v.findViewById(R.id.input_email);
+        passwordText = v.findViewById(R.id.input_password);
+        passwordConfirmText = v.findViewById(R.id.input_confirm_password);
+        signUpButton = v.findViewById(R.id.btn_signup);
         signUpButton.setOnClickListener(this);
         //database kullancı bağlantısı
         mAuth = FirebaseAuth.getInstance();
@@ -58,53 +63,107 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
 
 
     private void updateUI(FirebaseUser user) {
-        //burası ne yapacağına karar vereceğin yer
+
+        signUpButton.setEnabled(true);
+
         if(user != null){
             mDatabaseReferance = FirebaseDatabase.getInstance().getReference("Users");
             User newUser = new User();
-            newUser.setName(user.getDisplayName());
+            newUser.setName(userName);
             newUser.setMail(user.getEmail());
-            newUser.setDailyCount(-1);
+            newUser.setHelpCount(-1);
             mDatabaseReferance.child(user.getUid()).setValue(newUser);
 
             Intent i = new Intent(getActivity(),MainPageActivity.class);
             startActivity(i);
-            //finish();
+        }
+        else{
+
         }
     }
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.signup_button){
-            userMail = mailText.getText().toString();
-            userPassword = passwordText.getText().toString();
-            userConfirmPassword = passwordConfirmText.getText().toString();
 
-            if(userPassword.equals(userConfirmPassword)){
-                mAuth.createUserWithEmailAndPassword(userMail, userPassword)
-                        .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Log.d(TAG, "createUserWithEmail:success");
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    updateUI(user);
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                    Toast.makeText(getActivity(), "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                    updateUI(null);
-                                }
+        if(view.getId() == R.id.btn_signup && validate()){
+            signUpButton.setEnabled(false);
+            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Hesap Oluşturuluyor...");
+            progressDialog.show();
 
+            mAuth.createUserWithEmailAndPassword(userMail,userPassword)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "createUserWithuserMail:success");
+                                final FirebaseUser user = mAuth.getCurrentUser();
+
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                updateUI(user);
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "createUserWithuserMail:failure", task.getException());
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                updateUI(null);
+                                                progressDialog.dismiss();
+                                            }
+                                        }, 3000);
                             }
-                        });
+
+                        }
+                    });
             }
-            else{
-                Toast.makeText(getActivity(),"şifreler uyumlu değil",Toast.LENGTH_LONG).show();
-            }
+
+
+
+
+    }
+
+    public boolean validate(){
+        boolean valid = true;
+
+        userName = nameText.getText().toString();
+        userMail = mailText.getText().toString();
+        userPassword = passwordText.getText().toString();
+        userConfirmPassword = passwordConfirmText.getText().toString();
+
+        if (userName.isEmpty() || userName.length() < 3) {
+            nameText.setError("Lütfen en az üç karakter giriniz!");
+            valid = false;
+        } else {
+            nameText.setError(null);
         }
 
+        if (userMail.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(userMail).matches()) {
+            mailText.setError("Lütfen geçerli bir mail adresi giriniz");
+            valid = false;
+        } else {
+            mailText.setError(null);
+        }
+
+        if (userPassword.isEmpty() || userPassword.length() < 4 || userPassword.length() > 10) {
+            passwordText.setError("en az 6 karakterli ve içinde sayı ve yıldız bulundurun!");
+            valid = false;
+        } else {
+            passwordText.setError(null);
+        }
+        if(!userConfirmPassword.equals(userPassword)){
+            passwordText.setError("Şİfreler aynı değil");
+            passwordConfirmText.setError("");
+            valid = false;
+        }else{
+            passwordText.setError(null);
+            passwordConfirmText.setError(null);
+        }
+        return valid;
     }
 }

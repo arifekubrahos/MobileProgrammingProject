@@ -18,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.firebase.geofire.GeoFire;
@@ -59,6 +60,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
 
     private DatabaseReference mDatabaseReference;
     private FirebaseUser mUser;
+    private int hascount;
 
     private GeoLocation userGeolocation;
     private GeoFire userGeofire; //userlarını içinden bizimkini bulacaz
@@ -70,6 +72,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
+    private FloatingActionButton helpButton;
 
     private List<Help> helpList =new ArrayList<Help>(); //Bu listeyi adaptera göndericez onkeyexistde almamız gerek
     private List<String> userList = new ArrayList<>();//hangi userlar yakında kullanıcı idleri
@@ -88,10 +91,13 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
         recyclerView.setLayoutManager(layoutManager);
         adapter = new MainPageAdapter(helpList);
         recyclerView.setAdapter(adapter);
+        helpButton = findViewById(R.id.helpButton);
 
         //database bağlantısı sağlayarak kullanıcıyı konumunu ve postların konumlarını alıyoruz
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+        Log.d(TAG, mUser.getUid());
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseProcess();
         userGeofire = new GeoFire(mDatabaseReference.child("Users Location"));
         helpGeofire = new GeoFire(mDatabaseReference.child("Help Location"));
 
@@ -109,7 +115,6 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
 
 
     }
-
     /*Create post button*/
     public void createHelpClick(View v){
 
@@ -223,39 +228,13 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
         });
 
     }
-    
-    /*change adapter list according to database, adaptera buradan gönderiyoruz; post idler var elimizde*/
-    public void dataChange(){
-        if(userList.size() != 0){
-            mDatabaseReference.child("Help Post").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    helpList.clear();
-                    for(DataSnapshot ds: dataSnapshot.getChildren()){
-                        for(int i = 0 ; i<userList.size(); i++){
-                            if(userList.get(i).equals(ds.getKey())){
-                                helpList.add(ds.getValue(Help.class));
-                                Log.d(TAG,"key "+ds.getKey()+"usrlist "+userList.size());
-                            }
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
 
     /*who is in the area*/
     @Override
     public void onKeyEntered(String key, GeoLocation location) {
         //içine girenler post idelerini döndürüyor
         userList.add(key);
-        dataChange();
+        databaseProcess();
     }
 
     /*who is out of the area*/
@@ -263,7 +242,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
     public void onKeyExited(String key) {
         //içinden çıkanlar
         userList.remove(key);
-        dataChange();
+        databaseProcess();
     }
 
     @Override
@@ -284,5 +263,35 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    public void databaseProcess(){
+
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                hascount = Integer.parseInt(dataSnapshot.child("Users").child(mUser.getUid()).child("helpCount").getValue().toString());
+                if(hascount == 0)
+                 helpButton.setVisibility(View.GONE);
+
+                helpList.clear();
+                for(DataSnapshot ds: dataSnapshot.child("Help Post").getChildren()){
+                    for(int i = 0 ; i< userList.size(); i++){
+                        if(userList.get(i).equals(ds.getKey())){
+                            helpList.add(ds.getValue(Help.class));
+                            Log.d(TAG,"key "+ds.getKey()+"usrlist "+userList.size());
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 }
