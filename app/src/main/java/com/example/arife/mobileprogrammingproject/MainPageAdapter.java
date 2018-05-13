@@ -1,5 +1,6 @@
 package com.example.arife.mobileprogrammingproject;
 
+import android.nfc.Tag;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +31,6 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MyView
     private static final String TAG = "ADAPTER FOR CREATE HELP" ;
     private List<Help> helpList;
     private DatabaseReference mDatabaseReference;
-    private DatabaseReference dbREf;
     private FirebaseUser mUser;  //bunu aynı kullanıcı olmasın diye kullnıcaz
 
     public MainPageAdapter(List<Help> helpList){
@@ -38,66 +38,62 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MyView
     }
 
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private TextView nameText, contentText,titleText, descText;
         private Button helpButton;
+        private MyClickListener listener;
 
-        public MyViewHolder(View itemView) {
+        public interface MyClickListener {
+            void onEdit(int p, Button helpButton);
+        }
+
+        public MyViewHolder(View itemView, MyClickListener listener) {
             super(itemView);
+            this.listener = listener;
             nameText =itemView.findViewById(R.id.nameHelpText);
             contentText =itemView.findViewById(R.id.contentHelpText);
             titleText =itemView.findViewById(R.id.titleHelpText);
             descText =itemView.findViewById(R.id.descHelpText);
             helpButton = itemView.findViewById(R.id.helpButton);
+
+            helpButton.setOnClickListener(this);
         }
 
         /*istek gönderme!*/
         @Override
         public void onClick(View view) {
-            mUser = FirebaseAuth.getInstance().getCurrentUser();
-            mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-            dbREf = FirebaseDatabase.getInstance().getReference().child("Help Request");
 
-            mDatabaseReference.child("Help Post").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot ds: dataSnapshot.getChildren()){
-                        Help help  = ds.getValue(Help.class);
-                        //UID kullanıcı eşit olamayacak unutma
-                        //help postların içinde görüntü olarak getiriğimiz sıradaki göndeririyi arıyoruz
-                        if(help.getName().equals(helpList.get(getAdapterPosition()).getName())&&
-                                help.getContent().equals(helpList.get(getAdapterPosition()).getContent())&&
-                                help.getTitle().equals(helpList.get(getAdapterPosition()).getTitle()) &&
-                                help.getDescription().equals(helpList.get(getAdapterPosition()).getDescription())){
-
-                            String key = ds.getKey();
-                            Map<String, String> userRequest = new HashMap<String, String>();
-                            userRequest.put("user",mUser.getUid());
-                            dbREf.child(key).setValue(userRequest);
-                        }
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e(TAG,"DATABASE HATASI OLUŞTU");
-                }
-            });
-
+            switch (view.getId()) {
+                case R.id.helpButton:
+                    listener.onEdit(this.getLayoutPosition(), helpButton);
+                    break;
+                default:
+                    break;
+            }
 
         }
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.help_card,parent,false);
+         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.help_card,parent,false);
+         MyViewHolder holder = new MyViewHolder(v, new MyViewHolder.MyClickListener() {
+            @Override
+            public void onEdit(final int p,Button helpButton ){
+                helpButton.setText("İstek Gönderiliyor...");
+                helpButton.setEnabled(false);
+                mUser = FirebaseAuth.getInstance().getCurrentUser();
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                dataProcess(p ,helpButton);
 
-        return new MyViewHolder(v);
+
+            }
+        });
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
 
 
         Help h = helpList.get(position);
@@ -107,12 +103,39 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MyView
         holder.titleText.setText(h.getTitle());
         holder.descText.setText(h.getDescription());
 
-        //burada database check etmemiz lazım hala eğer, istek göndermişe bu şekilde olacak
-        holder.helpButton.setBackgroundColor(R.string.button_inactive);
-        holder.helpButton.setTextColor(R.string.button_inactive_text);
-        holder.helpButton.setText("İstek Gönderildi");
-        holder.helpButton.setEnabled(false);
-        holder.helpButton.setPressed(true);
+
+    }
+
+    public void dataProcess(final int p, final Button helpButton){
+        mDatabaseReference.child("Help Post").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Help help = ds.getValue(Help.class);
+
+                    if (help.getContent().equals(helpList.get(p).getContent()) &&
+                            help.getTitle().equals(helpList.get(p).getTitle()) &&
+                            help.getDescription().equals(helpList.get(p).getDescription())) {
+
+                        String key = ds.getKey();
+                        Map<String, String> userRequest = new HashMap<String, String>();
+                        userRequest.put("user", mUser.getUid());
+                        mDatabaseReference.child("Help Request").child(key).setValue(userRequest);
+
+                        helpButton.setBackgroundColor(R.string.button_inactive);
+                        helpButton.setTextColor(R.string.button_inactive_text);
+                        helpButton.setText("İstek Gönderildi");
+                        helpButton.setEnabled(false);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "DATABASE HATASI OLUŞTU");
+            }
+        });
     }
 
 
@@ -120,4 +143,5 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MyView
     public int getItemCount() {
         return helpList.size();
     }
+
 }

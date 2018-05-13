@@ -15,7 +15,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +76,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
     private FloatingActionButton helpButton;
+    private Toolbar cToolbar;
 
     private List<Help> helpList =new ArrayList<Help>(); //Bu listeyi adaptera göndericez onkeyexistde almamız gerek
     private List<String> userList = new ArrayList<>();//hangi userlar yakında kullanıcı idleri
@@ -82,6 +86,8 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainpage_activity);
 
+        cToolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(cToolbar);
 
         textView = findViewById(R.id.text);
         recyclerView = findViewById(R.id.dailyRecyclerView);
@@ -294,4 +300,26 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
 
 
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.profile_page:
+                Intent i = new Intent(getApplicationContext(),UserProfileActivity.class);
+                startActivity(i);
+                finish();
+                break;
+            case R.id.search:
+
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_up,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
 }

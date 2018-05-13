@@ -66,12 +66,14 @@ public class CreateHelpActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help_create_activity);
 
+        btoolbar = findViewById(R.id.tool_bar);
+        setSupportActionBar(btoolbar);
 
-
-        if(getSupportActionBar() != null){
+        if(getSupportActionBar() !=null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+
 
         /*database e ekleme yapıcaz*/
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
