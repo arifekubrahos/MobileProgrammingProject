@@ -22,6 +22,10 @@
 
         </activity>
         <activity android:name=".CreateHelpActivity"></activity>
+        <activity android:name=".UserPostActivity"></activity>
+        <activity android:name=".UserProfileActivity"></activity>
+        <activity android:name=".UserRequestActivity"
+            ></activity>
     </application>
 
 </manifest>

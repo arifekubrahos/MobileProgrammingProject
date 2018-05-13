@@ -23,14 +23,6 @@ public class User {
         return name;
     }
 
-    public String getMail() {
-        return mail;
-    }
-
-    public int getHelpCount() {
-        return dailyCount;
-    }
-
     public void setHelpCount(int dailyCount) {
         this.dailyCount = dailyCount;
     }

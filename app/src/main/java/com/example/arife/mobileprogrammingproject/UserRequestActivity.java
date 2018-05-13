@@ -3,9 +3,11 @@ package com.example.arife.mobileprogrammingproject;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +25,8 @@ import java.util.List;
  */
 
 public class UserRequestActivity extends AppCompatActivity {
+
+    private static final String TAG = "USER REQUEST";
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
@@ -30,9 +34,9 @@ public class UserRequestActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseRef;
     private FirebaseUser mUser;
 
-    private List<String> keyList = new ArrayList<>();
+    private List<String> userKeyList = new ArrayList<>();
     private List<User>   userList = new ArrayList<>();
-    private String content;
+    private String helpPostKey;
 
     private Toolbar ctoolbar;
     @Override
@@ -55,39 +59,38 @@ public class UserRequestActivity extends AppCompatActivity {
 
         userList.add(new User());
         if(bundle != null){
-            content = bundle.getString("key list");
+            helpPostKey = bundle.getString("key list");
 
         }
+        databaseProcess();
 
+        recyclerView = (RecyclerView) findViewById(R.id.helpRequestRecyler);
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new UserRequestAdapter(userList,userKeyList, getApplicationContext());
+        recyclerView.setAdapter(adapter);
     }
+
     public void databaseProcess(){
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(final DataSnapshot d: dataSnapshot.child("Help Request").getChildren()){
-                    if(content.equals(d.getKey())){
-                        keyList.add(d.child("user").getValue().toString());
-                        for(DataSnapshot ds: dataSnapshot.child("Users").getChildren()){
-                            if(d.child("user").getValue().toString().equals(ds.getKey())){
-                                userList.add(ds.getValue(User.class));
-                            }
-                        }
-                        mDatabaseRef.child("User").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for(DataSnapshot ds: dataSnapshot.getChildren()){
-
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+                for(final DataSnapshot d: dataSnapshot.child("Help Request").getChildren()) {
+                    if (helpPostKey.equals(d.getKey())) {
+                        userKeyList.add(d.child("user").getValue().toString());
+                        Log.d(TAG,"SLAS"+d.child("user").getValue().toString());
                     }
                 }
+                for(DataSnapshot ds: dataSnapshot.child("Users").getChildren()){
+                    for(int i=0; i<userKeyList.size(); i++){
+                        if(userKeyList.get(i).equals(ds.getKey())){
+                            userList.add(ds.getValue(User.class));
+                            Log.d(TAG,"key list "+ds.getKey());
+                        }
+                    }
+
+                }
+
             }
 
             @Override

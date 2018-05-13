@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
  * Created by Arife on 12.05.2018.
  */
 
-class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
 
     private FirebaseUser mUser;
 
@@ -55,6 +55,7 @@ class UserProfileActivity extends AppCompatActivity {
     }
 
     public void goPostClick(View v){
+        startActivity(new Intent(getApplicationContext(), UserPostActivity.class));
         finish();
     }
     public void signOutClick(View v){
