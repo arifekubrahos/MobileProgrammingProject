@@ -11,4 +11,5 @@
 
     <string name="button_inactive">#9E9E9E</string>
     <string name="button_inactive_text">#FAFAFA</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

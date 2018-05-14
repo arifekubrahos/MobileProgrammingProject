@@ -70,7 +70,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             mDatabaseReferance = FirebaseDatabase.getInstance().getReference("Users");
             User newUser = new User();
             newUser.setName(userName);
-            newUser.setMail(user.getEmail());
+            newUser.setMail(userMail);
             newUser.setHelpCount(-1);
             mDatabaseReferance.child(user.getUid()).setValue(newUser);
 

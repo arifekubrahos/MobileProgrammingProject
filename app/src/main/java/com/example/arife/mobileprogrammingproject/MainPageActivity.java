@@ -98,6 +98,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
         adapter = new MainPageAdapter(helpList);
         recyclerView.setAdapter(adapter);
         helpButton = findViewById(R.id.helpButton);
+        helpButton.setVisibility(View.VISIBLE);
 
         //database bağlantısı sağlayarak kullanıcıyı konumunu ve postların konumlarını alıyoruz
         mUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -276,7 +277,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                hascount = Integer.parseInt(dataSnapshot.child("Users").child(mUser.getUid()).child("helpCount").getValue().toString());
+                hascount = dataSnapshot.child("Users").child(mUser.getUid()).getValue(User.class).getHelpCount();
                 if(hascount == 0)
                  helpButton.setVisibility(View.GONE);
 
