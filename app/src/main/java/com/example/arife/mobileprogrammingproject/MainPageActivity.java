@@ -220,7 +220,7 @@ public class MainPageActivity extends AppCompatActivity implements GeoQueryEvent
                     userGeoLocation = new GeoLocation(location.latitude, location.longitude);
 
                     //radious in km, bunu değiştirilebilir yap!
-                    geoQuery = helpGeofire.queryAtLocation(userGeoLocation,10);
+                    geoQuery = helpGeofire.queryAtLocation(userGeoLocation,10000);
                     geoQuery.addGeoQueryEventListener(MainPageActivity.this);
                 }
                 else{

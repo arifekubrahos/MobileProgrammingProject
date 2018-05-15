@@ -64,7 +64,7 @@ public class UserRequestActivity extends AppCompatActivity {
         }
         databaseProcess();
 
-        recyclerView = (RecyclerView) findViewById(R.id.helpRequestRecyler);
+        recyclerView = findViewById(R.id.helpRequestRecyler);
         layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new UserRequestAdapter(userList,userKeyList, getApplicationContext());
@@ -75,7 +75,7 @@ public class UserRequestActivity extends AppCompatActivity {
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(final DataSnapshot d: dataSnapshot.child("Help Request").getChildren()) {
+                for(DataSnapshot d: dataSnapshot.child("Help Request").getChildren()) {
                     if (helpPostKey.equals(d.getKey())) {
                         userKeyList.add(d.child("user").getValue().toString());
                         Log.d(TAG,"SLAS"+d.child("user").getValue().toString());

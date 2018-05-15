@@ -92,7 +92,7 @@ public class UserPostActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-       Intent intent = new Intent(getApplicationContext(), UserRequestActivity.class);
+        Intent intent = new Intent(getApplicationContext(), UserRequestActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("key list",keyList.get(i));
         startActivity(intent);

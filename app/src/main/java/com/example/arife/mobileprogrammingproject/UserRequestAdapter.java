@@ -27,6 +27,7 @@ import java.util.zip.Inflater;
 
 public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.MyViewHolder>{
 
+    private static final String TAG = "REQUEST ADAPETER " ;
     private List<User> userList = new ArrayList<>();
     private List<String> userKeyList = new ArrayList<>();
     private Context mContext;
@@ -70,9 +71,11 @@ public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.
     public void databaseProcess(final int p, final boolean which){
 
         if(which){
-            Intent intent = new Intent(mContext, UserRequestActivity.class);
+            Log.d(TAG,""+userKeyList.get(p));
+            Intent intent = new Intent(mContext, MapsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("user id",userKeyList.get(p));
+            mContext.startActivity(intent);
         }
         if(!which){
             mDatabaseReference.addValueEventListener(new ValueEventListener() {
@@ -93,7 +96,7 @@ public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.
 
                 }
             });
-
+            notifyDataSetChanged();
         }
 
 

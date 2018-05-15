@@ -37,6 +37,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Arife on 10.05.2018.
  */
@@ -126,6 +129,7 @@ public class CreateHelpActivity extends AppCompatActivity
                     newHelp.setTitle(titleText.getText().toString());
                     newHelp.setDescription(descText.getText().toString());
                     mDatabaseReference.child("Help Post").child(keys).setValue(newHelp);
+                    startActivity(new Intent(getApplicationContext(),MainPageActivity.class));
                 }
                 else{
                     //başarılı kayır olmadı
