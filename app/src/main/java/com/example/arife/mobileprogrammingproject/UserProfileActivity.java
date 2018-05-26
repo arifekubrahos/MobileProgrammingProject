@@ -5,21 +5,23 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
- * Created by Arife on 12.05.2018.
+ * User profile
  */
 
-public class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseUser mUser;
 
@@ -27,26 +29,36 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView mailText;
 
     private Toolbar btoolbar;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_profile_activity);
+        setContentView(R.layout.activity_user_profile);
 
-        btoolbar = (Toolbar) findViewById(R.id.tool_bar);
-        setSupportActionBar(btoolbar);
+        btoolbar = findViewById(R.id.tool_bar_profile);
+        btoolbar.setNavigationIcon(R.drawable.left_arrow);
+        btoolbar.setNavigationOnClickListener(this);
 
-        if(getSupportActionBar() !=null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
         nameText =  findViewById(R.id.nameText);
         mailText =  findViewById(R.id.mailText);
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(mUser != null){
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot d: dataSnapshot.getChildren())
+                    if(d.getKey().equals(mUser.getUid()))
+                        nameText.setText(d.getValue(User.class).getName());
+            }
 
-            nameText.setText(mUser.getDisplayName());
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        if(mUser != null){
             mailText.setText(mUser.getEmail());
 
         }
@@ -65,4 +77,8 @@ public class UserProfileActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onClick(View view) {
+        startActivity(new Intent(getApplicationContext(), HomePageActivity.class));
+    }
 }

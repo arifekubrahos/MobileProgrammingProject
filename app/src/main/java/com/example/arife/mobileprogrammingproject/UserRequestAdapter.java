@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.zip.Inflater;
 
 /**
- * Created by Arife on 13.05.2018.
+ * Adapter for designing each request
+ *         add MyClickListener for button events
+ *
  */
 
 public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.MyViewHolder>{
@@ -31,18 +33,24 @@ public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.
     private List<User> userList = new ArrayList<>();
     private List<String> userKeyList = new ArrayList<>();
     private Context mContext;
+    private String helpPostKey;
     private DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-    public UserRequestAdapter(List<User> userList,List<String> userKeyList, Context mContext){
+    public UserRequestAdapter(List<User> userList,List<String> userKeyList,String helpPostKey, Context mContext){
         this.userKeyList = userKeyList;
         this.userList = userList;
         this.mContext = mContext;
+        this.helpPostKey = helpPostKey;
     }
-
+    //implement MyCLickListener method
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.help_request,parent,false);
-        MyViewHolder myViewHolder = new MyViewHolder(v, new MyViewHolder.MyClickListener() {
+        MyViewHolder myViewHolder = new MyViewHolder(v, new MyClickListener() {
+            @Override
+            public void onEdit(int p, Button helpButton) {
+            }
+
             @Override
             public void onAccept(int p) {
                 databaseProcess(p, true);
@@ -68,13 +76,14 @@ public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.
         return userList.size();
     }
 
+    //if user accept add one count of user who want to help, reject delete request
     public void databaseProcess(final int p, final boolean which){
 
         if(which){
             Log.d(TAG,""+userKeyList.get(p));
             Intent intent = new Intent(mContext, MapsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("user id",userKeyList.get(p));
+            intent.putExtra("strings",new String[]{userKeyList.get(p),helpPostKey});
             mContext.startActivity(intent);
         }
         if(!which){
@@ -102,16 +111,13 @@ public class UserRequestAdapter extends RecyclerView.Adapter<UserRequestAdapter.
 
     }
 
+    //add button to listener
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView nameText;
         private Button acceptButton,rejectButton;
         private MyClickListener listener;
 
-        public interface MyClickListener {
-            void onAccept(int p);
-            void onReject(int p);
-        }
 
         public MyViewHolder(View itemView, MyClickListener listener) {
             super(itemView);

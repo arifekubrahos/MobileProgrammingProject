@@ -9,6 +9,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/superhero"
+            android:layout_margin="5dp"/>
 
         <TextView
             android:id="@+id/nameText"
@@ -16,7 +21,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView"
-            android:textSize="12sp" />
+            android:textSize="18sp"
+            android:fontFamily="@font/caudex" />
 
 
     </LinearLayout>
@@ -25,6 +31,7 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:background="@color/nohelp_background"
         android:orientation="vertical"
         app:cardCornerRadius="3dp"
@@ -40,12 +47,18 @@
                 android:id="@+id/textView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Yardım etmek istiyor?" />
+                android:layout_marginLeft="10dp"
+                android:padding="6dp"
+                android:text="Yardım etmek istiyor"
+                android:fontFamily="@font/caudex"
+                android:textSize="14dp"
+                android:textColor="#424242" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_margin="5dp">
 
                 <Button
                     android:id="@+id/rejectButton"
@@ -54,16 +67,19 @@
                     android:layout_weight="1"
                     android:elevation="0dp"
                     android:text="Reddet"
-                    android:textColor="@android:color/white" />
+                    android:background="@color/white"
+                    android:fontFamily="@font/caudex"
+                    android:textColor="#6E6E6E"/>
 
                 <Button
                     android:id="@+id/acceptButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/yellow"
                     android:text="Kabul Et"
-                    android:textColor="@android:color/white" />
+                    android:fontFamily="@font/caudex"
+                    />
             </LinearLayout>
         </LinearLayout>
 

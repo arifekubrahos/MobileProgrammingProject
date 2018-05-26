@@ -22,13 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Arife on 13.05.2018.
+ * User help post getting into listview
  */
 
-public class UserPostActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class UserPostActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private DatabaseReference mDatabaseRef;
     private FirebaseUser mUser;
-
     private List<String> helpList = new ArrayList<>();
     private List<String> keyList = new ArrayList<>();
 
@@ -39,16 +38,12 @@ public class UserPostActivity extends AppCompatActivity implements AdapterView.O
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.help_post_activity);
+        setContentView(R.layout.activity_help_post);
 
         listView = findViewById(R.id.list_item);
-        dtoolbar = findViewById(R.id.tool_bar);
-        setSupportActionBar(dtoolbar);
-
-        if(getSupportActionBar() !=null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+        dtoolbar = findViewById(R.id.tool_bar_post);
+        dtoolbar.setNavigationIcon(R.drawable.left_arrow);
+        dtoolbar.setNavigationOnClickListener(this);
 
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -63,6 +58,7 @@ public class UserPostActivity extends AppCompatActivity implements AdapterView.O
 
     }
 
+    //return help
     public void databaseProcess(){
         mDatabaseRef.child("Help Post").addValueEventListener(new ValueEventListener() {
             @Override
@@ -73,10 +69,6 @@ public class UserPostActivity extends AppCompatActivity implements AdapterView.O
                     if(mUser.getUid().equals(d.getValue(Help.class).getuId())){
                         helpList.add(d.getValue(Help.class).getContent()+"\n"+d.getValue(Help.class).getDescription());
                         keyList.add(d.getKey());
-                    }
-                    else{
-                        helpList.add("");
-                        keyList.add("");
                     }
 
                 }
@@ -96,5 +88,10 @@ public class UserPostActivity extends AppCompatActivity implements AdapterView.O
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("key list",keyList.get(i));
         startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        startActivity(new Intent(getApplicationContext(), UserProfileActivity.class));
     }
 }

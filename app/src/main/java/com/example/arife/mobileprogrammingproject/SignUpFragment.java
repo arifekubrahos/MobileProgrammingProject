@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,11 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
- * Created by Arife on 4.05.2018.
+ * User signup process; adding firebase new user authentication and also database that is named "Users"
  */
 
 public class SignUpFragment extends Fragment implements View.OnClickListener {
 
+    private TextView errorText;
     private EditText nameText;
     private EditText mailText;
     private EditText passwordText;
@@ -55,13 +56,14 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         passwordConfirmText = v.findViewById(R.id.input_confirm_password);
         signUpButton = v.findViewById(R.id.btn_signup);
         signUpButton.setOnClickListener(this);
+        errorText = v.findViewById(R.id.errorText);
         //database kullancı bağlantısı
         mAuth = FirebaseAuth.getInstance();
 
         return v;
     }
 
-
+    //add database, go to home page
     private void updateUI(FirebaseUser user) {
 
         signUpButton.setEnabled(true);
@@ -74,14 +76,15 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             newUser.setHelpCount(-1);
             mDatabaseReferance.child(user.getUid()).setValue(newUser);
 
-            Intent i = new Intent(getActivity(),MainPageActivity.class);
+            Intent i = new Intent(getActivity(),HomePageActivity.class);
             startActivity(i);
         }
         else{
-
+            errorText.setText("Hata oluştu lütfen tekrar deneyin.");
         }
     }
 
+    //adding authentication on firebase
     @Override
     public void onClick(View view) {
 
@@ -128,6 +131,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    //error check on layout
     public boolean validate(){
         boolean valid = true;
 
@@ -157,7 +161,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             passwordText.setError(null);
         }
         if(!userConfirmPassword.equals(userPassword)){
-            passwordText.setError("Şİfreler aynı değil");
+            passwordText.setError("Şifreler aynı değil");
             passwordConfirmText.setError("");
             valid = false;
         }else{

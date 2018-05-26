@@ -6,16 +6,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-
+/*
+* User signup or login app; fragment using mainpage for switching easily
+*/
 public class MainActivity extends AppCompatActivity {
 
-    //remove eklenecek
+
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_authorize);
+        setContentView(R.layout.activity_main);
         fragmentManager = getFragmentManager();
 
     }

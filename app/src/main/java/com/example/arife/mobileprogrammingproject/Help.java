@@ -5,7 +5,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 
 /**
- * Created by Arife on 10.05.2018.
+ * Help class
  */
 
 public class Help {

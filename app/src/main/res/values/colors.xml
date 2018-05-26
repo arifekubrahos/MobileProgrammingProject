@@ -3,8 +3,13 @@
     <color name="colorPrimary">#88cbfb</color>
     <color name="colorPrimaryDark">#4a8caf</color>
     <color name="colorAccent">#c1e987</color>
-    <color name="highlighted_text_material">#66b6d7a8</color>
+    <color name="highlighted_text_material">#ebf4e2</color>
     <color name="help_background">#ffd180</color>
     <color name="nohelp_background">#c3b0b0</color>
     <color name="reds">#f44336</color>
+    <color name="butonNormal">#ffd6d7d7</color>
+    <color name="white">#ffffff</color>
+    <color name="yellow">#ffffbb33</color>
+    <color name="background">#F7F8E0</color>
+    <color name="yellow2">#FACC2E</color>
 </resources>

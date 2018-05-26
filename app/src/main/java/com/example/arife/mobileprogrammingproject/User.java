@@ -1,7 +1,7 @@
 package com.example.arife.mobileprogrammingproject;
 
 /**
- * Created by Arife on 4.05.2018.
+ * User class
  */
 
 public class User {

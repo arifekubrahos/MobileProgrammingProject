@@ -1,16 +1,20 @@
 package com.example.arife.mobileprogrammingproject;
 
-import android.*;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -23,36 +27,33 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Logger;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import Modules.DirectionFinder;
-import Modules.DirectionFinderListener;
-import Modules.Route;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
 
     private static final int REQUEST_CODE = 12;
     private static final String TAG = "MAP ACTİVİTY" ;
-    private FusedLocationProviderClient mFusedLocationClient; //location APIs ffrom google api
-    private LocationRequest mLocationRequest;
-    private com.google.android.gms.location.LocationCallback mLocationCallback;
-    private LatLng originLatLng;
-    private LatLng destinationLatLng;
-
+    private TextView helpUserName;
+    private Button thanksButton;
     private GoogleMap mMap;
-    private ArrayList<LatLng> listPoints = new ArrayList<>();
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
@@ -60,7 +61,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String userid;
 
     private DatabaseReference mDatabaseReference;
+    private FirebaseUser mUser;
     private GeoFire geoFire;
+    private String postKey;
 
 
     @Override
@@ -72,22 +75,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Bundle bundle = getIntent().getExtras();
-        if(bundle != null){
-            userid = bundle.getString("user id");
-        }
+        Intent intent = getIntent();
+        String[] myStrings = intent.getStringArrayExtra("strings");
+        userid = myStrings[0];
+        postKey = myStrings[1];
+
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         geoFire = new GeoFire(mDatabaseReference.child("Users Location"));
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        helpUserName = findViewById(R.id.nameText);
+        thanksButton = findViewById(R.id.thanks);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+               helpUserName.setText(String.valueOf(dataSnapshot.child("Users").child(userid).child("name").getValue())+"'ye");
 
-        checkForLocationRequest();
-        buildLocationCallBack();
-        databaseProcess();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        helpDatabaseProcess();
 
     }
+    //if user help add one to count
+    public void mapclick(View v){
+        mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int count = Integer.parseInt(String.valueOf(dataSnapshot.child("Users").child(mUser.getUid()).child("helpCount").getValue())) ;
+                mDatabaseReference.child("Users").child(userid).child("helpCount").setValue(count+1);
+                thanksButton.setText("Biz Teşekkür ederiz.");
+                mDatabaseReference.child(postKey).removeValue();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -102,21 +133,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcmus, 18));
-
-        if(originLatLng!= null && destinationLatLng!= null){
-            userMap();
-        }
-        else{
-            mMap.addMarker(new MarkerOptions().title("burada").position(hcmus));
-        }
 
     }
 
-    public void userMap(){
+    //go to direction finder with user location and request location
+    public void userMap(LatLng destinationLatLng, LatLng originLatLng){
 
-        String origin = String.valueOf(originLatLng.latitude)+","+String.valueOf(originLatLng.longitude);
-        String destination = String.valueOf(destinationLatLng.latitude)+","+String.valueOf(destinationLatLng.longitude);
+        String destination= destinationLatLng.latitude+","+destinationLatLng.longitude ;
+        String origin = originLatLng.latitude+","+originLatLng.longitude;
+
         try {
             new DirectionFinder(this, origin, destination).execute();
         } catch (UnsupportedEncodingException e) {
@@ -124,17 +149,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public boolean databaseProcess(){
+    //get help location here
+    public void helpDatabaseProcess(){
         if(userid != null){
             geoFire.getLocation(userid, new LocationCallback() {
                 @Override
                 public void onLocationResult(String key, GeoLocation location) {
-                    listPoints.add(0,new LatLng(location.latitude, location.longitude));
-                    originLatLng = listPoints.get(0);
-                    originMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .title("help ")
-                            .position(listPoints.get(0))));
-
+                    LatLng destinationLatLng = new LatLng(location.latitude, location.longitude);
+                    Log.d(TAG,"destination "+destinationLatLng.longitude);
+                    userDatabaseProcess(destinationLatLng);
                 }
 
                 @Override
@@ -143,22 +166,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
         }
-        return false;
+        else
+            Log.d(TAG, "user id null");
+
     }
 
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case REQUEST_CODE:
-                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    mMap.setMyLocationEnabled(true);
-                }
-                break;
-        }
+    /*get the user location here*/
+    public void userDatabaseProcess(final LatLng destinationLatLng){
+        geoFire.getLocation(mUser.getUid(), new LocationCallback() {
+            @Override
+            public void onLocationResult(String key, GeoLocation location) {
+                LatLng originLatLng = new LatLng(location.latitude, location.longitude);
+                Log.d(TAG,"des "+destinationLatLng.longitude+" origin"+originLatLng.longitude);
+                userMap(destinationLatLng, originLatLng);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-
+    //add marker
     @Override
     public void onDirectionFinderStart() {
         progressDialog = ProgressDialog.show(this, "Please wait.",
@@ -183,6 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //draw map
     @Override
     public void onDirectionFinderSuccess(List<Route> routes) {
         progressDialog.dismiss();
@@ -194,10 +225,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
 
             originMarkers.add(mMap.addMarker(new MarkerOptions()
-                    .title(route.startAddress)
+                    .title("Ben"+"\n"+route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(mMap.addMarker(new MarkerOptions()
-                    .title(route.endAddress)
+                    .title("Yardım"+"\n"+route.endAddress)
                     .position(route.endLocation)));
 
             PolylineOptions polylineOptions = new PolylineOptions().
@@ -211,30 +242,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    /*get the user location here*/
-    public void buildLocationCallBack() {
-        mLocationCallback = new com.google.android.gms.location.LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                   listPoints.add(1,new LatLng(location.getLatitude(), location.getLongitude()));
-                   destinationLatLng = listPoints.get(1);
 
-                    destinationMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .title("user ")
-                            .position(destinationLatLng)));
-
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case REQUEST_CODE:
+                if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    mMap.setMyLocationEnabled(true);
                 }
-
-            }
-        };
-    }
-
-    /*determine the updates property ex: how many times it takes the location */
-    public void checkForLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                break;
+        }
     }
 }

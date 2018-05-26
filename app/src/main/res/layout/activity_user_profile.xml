@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/tool_bar_profile">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profilim"
+            android:fontFamily="@font/caudex"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:layout_gravity="center"
+            android:textStyle="bold"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <ImageView
+        android:id="@+id/profile"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:padding="2dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/superhero"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/nameText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:fontFamily="@font/caudex"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/mailText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="TextView"
+        android:fontFamily="@font/caudex"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/helpPostButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="@color/yellow"
+        android:drawableRight="@drawable/ic_keyboard_arrow_right_white_24dp"
+        android:text="Yardım İsteklerini Gör"
+        android:fontFamily="@font/caudex"
+        android:textStyle="bold"
+        android:paddingLeft="45dp"
+        android:textColor="@android:color/white"
+        android:onClick="goPostClick"/>
+
+
+    <Button
+        android:id="@+id/signOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="50dp"
+        android:padding="15dp"
+        android:background="#F2F2F2"
+        android:text="Çıkış Yap"
+        android:fontFamily="@font/caudex"
+        android:textStyle="bold"
+        android:textColor="#848484"
+        android:onClick="signOutClick"/>
+
+</LinearLayout>

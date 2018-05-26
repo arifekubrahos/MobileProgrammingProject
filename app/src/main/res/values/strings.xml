@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobileProgrammingProject</string>
+    <string name="app_name">Yardım Eli</string>
 
     <string name="categorie_names">kategori seçin</string>
     <string name="child">gps</string>
@@ -9,7 +9,7 @@
         <item>Manevi</item>
     </string-array>
 
-    <string name="button_inactive">#9E9E9E</string>
+    <string name="button_inactive">#ebf4e2</string>
     <string name="button_inactive_text">#FAFAFA</string>
     <string name="title_activity_maps">Map</string>
 </resources>

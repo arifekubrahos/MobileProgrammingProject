@@ -9,9 +9,9 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="56dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp">
+        android:paddingTop="80dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp">
 
 
         <!--  Name Label -->
@@ -24,7 +24,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:hint="İsminizi Girin" />
+                android:hint="İsim"
+                android:fontFamily="@font/caudex"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Email Label -->
@@ -37,7 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:hint="Mailinizi Girin" />
+                android:hint="Mail"
+                android:fontFamily="@font/caudex" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -50,7 +52,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:hint="Şifrenizi Girin"/>
+                android:hint="Şifre"
+                android:fontFamily="@font/caudex"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -63,7 +66,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:hint="Tekrar Şİfrenizi Gİrin"/>
+                android:hint="Şifre (Tekrar)"
+                android:fontFamily="@font/caudex"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Signup Button -->
@@ -71,11 +75,16 @@
             android:id="@+id/btn_signup"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:padding="12dp"
-            android:text="Hesap Oluştur"/>
+            android:layout_marginTop="40dp"
+            android:text="Hesap Oluştur"
+            android:fontFamily="@font/caudex"
+            android:textStyle="bold"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@color/white"/>
 
 
     </LinearLayout>
 </ScrollView>
+
+
+
